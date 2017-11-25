@@ -1,28 +1,122 @@
+//Project Environment
 let express = require("express");
+let bodyParser = require("body-parser");
+let mongoose = require('mongoose');
 let app = express();
+let router = express.Router();
 
+// Modles
+let Camp = require('./app/models/camp');
+
+// Connect MongoDB
+mongoose.connect('mongodb://localhost/camp', {
+    useMongoClient: true
+});
+mongoose.Promise = global.Promise;
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 app.set("view engine", "ejs");
 
-app.get("/", function (req, res) {
-    res.render("index");
+let port = process.env.PORT || 8181;
+
+router.use(function (req, res, next) {
+    next();
 });
 
-app.get("/campgrounds", function (req, res) {
-    let data = [{
-        name: "Normal camp",
-        images: "http://www.goodtogocamping.com/wp-content/uploads/2011/06/DSC_0276.jpg"
-    }, {
-        name: "Easy camp",
-        images: "https://media-cdn.tripadvisor.com/media/photo-o/0f/48/8a/77/hintok-river-camp.jpg"
-    }]
-
-    console.log(data);
-    res.render("campgrounds", {
-        data: data
+router.get('/', function (req, res) {
+    res.json({
+        message: 'hooray! welcome to our api!'
     });
-
 });
 
-app.listen(8181, function () {
+router.route('/camps')
+
+    .post(function (req, res) {
+
+        let camp = new Camp(); // create a new instance of the Bear model
+        let campName = req.body.name; // set the bears name (comes from the request)
+        let campImage = req.body.image;
+        Camp.create({
+            name: campName,
+            image: campImage
+        }, function (err, camp) {
+            if (err) {
+                res.status(500).send();
+            } else {
+                res.json({
+                    message: 'Camp created'
+                });
+            }
+        });
+    })
+
+    .get(function (req, res) {
+        Camp.find(function (err, camp) {
+            if (err) {
+                res.status(500).send();
+            } else {
+                res.json(camp)
+                // res.render('campgrounds', {
+                //     camp: camp
+                // });
+                // console.log(camp);
+            }
+        });
+    })
+
+router.route('/camps/:camp_id')
+    .get(function (req, res) {
+        let campID = req.params.camp_id;
+        Camp.findById(campID, function (err, camp) {
+            if (err)
+                res.send(err);
+            res.json(camp);
+        });
+    })
+
+    .put(function (req, res) {
+        let campID = req.params.camp_id;
+        let campName = req.body.name;
+        let campImage = req.body.image;
+
+        Camp.update({
+            _id: campID
+        }, {
+            $set: {
+                name: campName,
+                image: campImage
+            }
+        }, function (err, camp) {
+            if (err) {
+                res.status(500).send();
+            } else {
+                res.json({
+                    message: 'Camp updated'
+                });
+            }
+        });
+    })
+
+    .delete(function (req, res) {
+        let campID = req.params.camp_id;
+        Camp.remove({
+            _id: campID
+        }, function (err, camp) {
+            if (err) {
+                res.status(500).send();
+            } else {
+                res.json({
+                    message: 'Successfully deleted'
+                });
+            }
+        });
+    })
+
+app.use('/api', router);
+
+app.listen(port, function () {
     console.log("App started");
 });

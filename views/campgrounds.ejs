@@ -1,7 +1,14 @@
-<% data.forEach(function(camp){%>
-    Camp :
-    <%=camp.name%>
-        <br> Image :
-        <img src="<%=camp.images%>" alt="">
+<% include partials/header %>
+    <form action="/campgrounds" method="POST">
+        <input type="text" name="name" placeholder="Camp name">
+        <input type="text" name="image" placeholder="Images URL">
+        <input type="submit" value="Submit">
+    </form>
+    <% camp.forEach(function(camp){%>
+        Camp :
+        <%=camp.name%> Image :
+            <img src="<%=camp.image%>" alt="">
+            <br>
 
-        <%})%>
+            <%})%>
+                <% include partials/footer %>
