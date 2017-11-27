@@ -23,6 +23,10 @@ app.set("view engine", "ejs");
 
 let port = process.env.PORT || 8181;
 
+app.get('/',function(){
+    res.json('Welcome to my first API !!!');
+});
+
 router.use(function (req, res, next) {
     next();
 });
