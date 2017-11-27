@@ -1,14 +1,67 @@
 <% include partials/header %>
-    <form action="/campgrounds" method="POST">
-        <input type="text" name="name" placeholder="Camp name">
-        <input type="text" name="image" placeholder="Images URL">
-        <input type="submit" value="Submit">
-    </form>
-    <% camp.forEach(function(camp){%>
-        Camp :
-        <%=camp.name%> Image :
-            <img src="<%=camp.image%>" alt="">
-            <br>
+    <div class="container">
+        <!-- Content here -->
+        <form action="/api/camps" method="post" id="mainform">
 
-            <%})%>
-                <% include partials/footer %>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="campname">Camp name</label>
+                    <input type="text" name="name" class="form-control" id="campname" placeholder="Camp name">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="imageurl">Image URL</label>
+                    <input type="url" name="image" class="form-control" id="imageurl" placeholder="Image URL">
+
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+
+            <!-- <input type="text" name="name" placeholder="Camp name">
+            <input type="text" name="image" placeholder="Images URL">
+            <input type="submit" value="Submit"> -->
+        </form>
+    </div>
+    <div class="container" style="margin-top:20px;">
+
+        <div class="card-deck">
+            <% camp.forEach(function(camp){%>
+                <div class="card">
+                    <img id="img" class="card-img-top" src="<%=camp.image%>" alt="Card image cap">
+                    <div class="card-body">
+                        <h4 class="card-title text-center" id="name">
+                            <%=camp.name%>
+                        </h4>
+                        <form action="/api/camps/<%=camp._id%>?_method=delete" method="post">
+                            <button class="btn btn-danger">Delete
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                        <button onclick="edit('<%=camp._id%>','<%=camp.name%>','<%=camp.image%>')" class="btn btn-warning" style="margin-top:5px;color:white">Edit
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+
+                    </div>
+                </div>
+                <%})%>
+        </div>
+
+    </div>
+
+    <script>
+        function edit(id, name, image) {
+            console.log(id);
+            console.log(name);
+            console.log(image);
+            let form = document.querySelector("#mainform");
+            let campnameInput = document.querySelector("#campname");
+            let imageurlInput = document.querySelector("#imageurl");
+
+            form.setAttribute("action","/api/camps/"+id+"?_method=put",);
+            campnameInput.setAttribute("value",name);
+            imageurlInput.setAttribute("value",image);
+
+        }
+    </script>
+
+    <% include partials/footer %>

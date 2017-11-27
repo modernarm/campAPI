@@ -1,9 +1,12 @@
 //Project Environment
-let express = require("express");
-let bodyParser = require("body-parser");
+let express = require('express');
+let bodyParser = require('body-parser');
 let mongoose = require('mongoose');
+var methodOverride = require('method-override');
 let app = express();
 let router = express.Router();
+let request = require('request');
+let port = process.env.PORT || 8181;
 
 // Modles
 let Camp = require('./app/models/camp');
@@ -18,14 +21,23 @@ mongoose.Promise = global.Promise;
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(methodOverride('_method'));
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
 
-let port = process.env.PORT || 8181;
 
-app.get('/',function(){
-    res.json('Welcome to my first API !!!');
+
+app.get('/campgrounds', function (req, res) {
+    request('https://armnode-api.herokuapp.com/api/camps', function (error, response, body) {
+        let data = JSON.parse(body);
+        // console.log(data);
+        res.render('campgrounds', {
+            camp: data
+        });
+    });
 });
+
+
 
 router.use(function (req, res, next) {
     next();
@@ -33,7 +45,7 @@ router.use(function (req, res, next) {
 
 router.get('/', function (req, res) {
     res.json({
-        message: 'hooray! welcome to our api!'
+        message: 'hooray! welcome to our api! '
     });
 });
 
@@ -51,9 +63,8 @@ router.route('/camps')
             if (err) {
                 res.status(500).send();
             } else {
-                res.json({
-                    message: 'Camp created'
-                });
+                console.log('Camp created');
+                res.redirect('/campgrounds');
             }
         });
     })
@@ -64,21 +75,18 @@ router.route('/camps')
                 res.status(500).send();
             } else {
                 res.json(camp)
-                // res.render('campgrounds', {
-                //     camp: camp
-                // });
-                // console.log(camp);
             }
         });
     })
-
 router.route('/camps/:camp_id')
     .get(function (req, res) {
         let campID = req.params.camp_id;
         Camp.findById(campID, function (err, camp) {
-            if (err)
+            if (err) {
                 res.send(err);
-            res.json(camp);
+            } else {
+                res.json(camp);
+            }
         });
     })
 
@@ -98,9 +106,8 @@ router.route('/camps/:camp_id')
             if (err) {
                 res.status(500).send();
             } else {
-                res.json({
-                    message: 'Camp updated'
-                });
+                console.log('Camp updated');
+                res.redirect('/campgrounds');
             }
         });
     })
@@ -113,9 +120,8 @@ router.route('/camps/:camp_id')
             if (err) {
                 res.status(500).send();
             } else {
-                res.json({
-                    message: 'Successfully deleted'
-                });
+                console.log('Camp deleted');
+                res.redirect('/campgrounds');
             }
         });
     })
