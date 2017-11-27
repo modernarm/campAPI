@@ -27,7 +27,7 @@ app.set("view engine", "ejs");
 
 
 
-app.get('/campgrounds', function (req, res) {
+app.get('/', function (req, res) {
     request('https://armnode-api.herokuapp.com/api/camps', function (error, response, body) {
         let data = JSON.parse(body);
         // console.log(data);
@@ -36,8 +36,6 @@ app.get('/campgrounds', function (req, res) {
         });
     });
 });
-
-
 
 router.use(function (req, res, next) {
     next();
