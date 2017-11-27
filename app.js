@@ -9,7 +9,8 @@ let router = express.Router();
 let Camp = require('./app/models/camp');
 
 // Connect MongoDB
-mongoose.connect('mongodb://localhost/camp', {
+// mongoose.connect('mongodb://localhost/camp', {
+mongoose.connect('mongodb://modernarm:013871349arm@ds121906.mlab.com:21906/api', {
     useMongoClient: true
 });
 mongoose.Promise = global.Promise;
